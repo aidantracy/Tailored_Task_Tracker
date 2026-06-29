@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+{% block title %}Process Dashboard{% endblock %}
+
+{% block content %}
+{% if current_user.is_authenticated %}
+
+<main id="board" class="flex-grow p-6 overflow-x-hidden"
+      data-dashboard-id="{{ dashboard_id|default(0) }}"
+      {% if board_year %}data-board-year="{{ board_year }}"{% endif %}
+      {% if board_month %}data-board-month="{{ '%02d'|format(board_month) }}"{% endif %}>
+
+  <!-- Top scroll bar (now hidden via CSS, kept for JS compatibility) -->
+  <div id="board-scroll-top" class="board-top-scroll" aria-hidden="false">
+    <div class="board-top-scroll-inner"></div>
+  </div>
+
+  <!-- Responsive grid: 1 col on mobile, 2 on small, 3 on large, 5 on XL -->
+  <div class="grid gap-5 board-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+
+    <!-- =======================
+         Task Card Template
+         ======================= -->
+    <template id="task-card-template">
+      <article class="task-card bg-white shadow-sm hover:shadow transition-shadow rounded-xl cursor-pointer"
+               role="article" aria-label="Task" data-tags="" tabindex="0" draggable="true" data-draggable-task="1">
+        <!-- Header: Title (left) + Assignee (right) -->
+        <div class="flex items-start justify-between gap-3 p-3">
+          <div class="flex items-start gap-3 min-w-0">
+            <span data-statusbar class="mt-1 h-4 w-1.5 rounded bg-slate-200 flex-shrink-0"></span>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5" data-title-wrap data-fulltitle="">
+                <h3 class="text-[15px] font-semibold leading-tight text-[var(--brand-text-dark)] min-w-0">
+                  <span class="title-clip truncate" data-title>New task</span>
+                </h3>
+
+                <!-- Comment indicator (hidden via CSS until comments exist) -->
+                <span data-comment-indicator
+                      data-open-thread
+                      class="inline-flex items-center gap-1"
+                      aria-hidden="true" title="Comments">
+                  <svg viewBox="0 0 24 24" class="h-[16px] w-[16px]" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M21 15a4 4 0 0 1-4 4H8l-5 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+                  </svg>
+                  <span data-comment-count class="text-[11px] leading-none"></span>
+                  <span class="ping-dot" aria-hidden="true"></span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assignee (popover managed by JS) -->
+          <span class="inline-flex items-center gap-2 flex-shrink-0 ml-2 relative" data-assignee-container>
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-full
+                         bg-[var(--brand-light-blue)] text-[var(--brand-blue)] text-[11px] font-bold assignee-click no-modal"
+                  data-avatar>U</span>
+            <span class="text-[13px] text-[var(--brand-text-dark)] truncate max-w-[10rem] assignee-click no-modal"
+                  data-assignee>Unassigned</span>
+
+            <div class="assignee-popover absolute right-0 mt-1 z-10 bg-white border border-slate-200 rounded shadow p-2 no-modal"
+                 data-assignee-popover style="display:none;min-width:240px;">
+              <div class="flex flex-col gap-2">
+                <input type="text" class="assignee-input" data-assignee-input placeholder="Assignee name">
+                <div class="flex items-center gap-2 justify-end">
+                  <button type="button" class="assignee-save text-xs px-2 py-1 rounded border border-slate-300">Save</button>
+                  <button type="button" class="assignee-cancel text-xs px-2 py-1 rounded border border-slate-300">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </span>
+        </div>
+
+        <!-- Meta row: status chip + due date + recurring icon -->
+        <div class="px-3 pb-2">
+          <div class="flex items-center gap-2 text-[13px] flex-nowrap">
+            <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 ring-1 ring-inset
+                         bg-[#e2e8f0] text-[#334155] ring-[#cbd5e1]" data-chip>
+              <span aria-hidden="true">●</span>
+              <span class="sr-only">Status:</span>
+              <span data-chip-text>Not Started</span>
+            </span>
+
+            <span class="overdue-chip hidden rounded-full px-2 py-0.5 ring-1 ring-inset bg-[#fde8e8] text-[#9b1c1c] ring-[#fecaca]"
+                  data-overdue>Overdue</span>
+
+            <div class="relative ml-auto flex items-center gap-1" data-date-container>
+              <button type="button" data-date-btn
+                      class="inline-flex items-center gap-1 text-[var(--brand-text-light)] hover:underline no-modal">
+                <svg viewBox="0 0 24 24" class="h-[14px] w-[14px]" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M8 2v3M16 2v3M3 10h18M5 6h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/>
+                </svg>
+                <time data-due datetime="">—</time>
+              </button>
+
+              <!-- Recurring icon-only toggle using image -->
+              <button type="button"
+                class="inline-flex items-center justify-center rounded-full px-1.5 py-1 text-[11px] border border-slate-300 text-slate-600 hover:bg-slate-50 no-modal"
+                data-recurring-toggle
+                aria-pressed="true"
+                title="Recurring task">
+                <img src="{{ url_for('static', filename='img/recurring.png') }}"
+                     alt=""
+                     class="h-4 w-4 pointer-events-none">
+                <span data-recurring-label class="sr-only">Recurring</span>
+              </button>
+
+              <div class="date-popover absolute right-0 mt-1 z-10 bg-white border border-slate-200 rounded shadow p-2 no-modal"
+                   data-date-popover style="display:none;">
+                <div class="flex items-center gap-2">
+                  <input type="date" class="date-input border border-slate-300 rounded px-2 py-1" data-due-input />
+                  <button type="button" class="date-save text-xs px-2 py-1 rounded border border-slate-300 hover:bg-slate-50">Save</button>
+                  <button type="button" class="date-cancel text-xs px-2 py-1 rounded border border-slate-300 hover:bg-slate-50">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Smooth-expanding note area -->
+          <div class="note-area" data-note-area>
+            <p class="mt-2 text-[13px] leading-snug text-[var(--brand-text-light)]" data-note></p>
+          </div>
+
+          <!-- Add Note tray (expands first), pill fades in after -->
+          <div class="note-cta-tray">
+            <button type="button"
+                    data-action="add-note"
+                    class="note-add-btn mt-2 no-modal"
+                    title="Add a note"
+                    style="display:none;">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+              </svg>
+              <span>Add note</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Actions row -->
+        <div class="px-3 pb-3">
+          <!-- CHANGED: allow wrapping, no internal scrollbar -->
+          <div class="mt-2 flex flex-wrap items-center gap-1.5" data-status-buttons>
+            <button type="button" data-set-status="notexpected"
+              class="rounded-md border border-slate-200 px-2 py-1 text-[12px] hover:bg-slate-50 no-modal">Not Expected</button>
+            <button type="button" data-set-status="progress"
+              class="rounded-md border border-slate-200 px-2 py-1 text-[12px] hover:bg-slate-50 no-modal">In Progress</button>
+            <button type="button" data-set-status="stuck"
+              class="rounded-md border border-slate-200 px-2 py-1 text-[12px] hover:bg-slate-50 no-modal">Stuck</button>
+            <button type="button" data-set-status="done"
+              class="rounded-md border border-slate-200 px-2 py-1 text-[12px] hover:bg-slate-50 no-modal">Done</button>
+
+            <!-- Revert (visible only when status === done) -->
+            <button type="button" data-action="revert-done"
+              class="revert-btn hidden shrink-0 inline-flex items-center gap-1 rounded-md border border-slate-200 px-2 py-1 text-[12px] hover:bg-slate-50 no-modal"
+              title="Revert" aria-label="Revert from Done">
+              <svg viewBox="0 0 24 24" class="h-[16px] w-[16px]" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+              </svg>
+              <span>revert</span>
+            </button>
+
+            <!-- Delete (icon-only) -->
+            <button type="button" data-action="delete"
+              class="ml-auto shrink-0 inline-flex items-center justify-center rounded-md border border-slate-200 px-2 py-1 text-[12px] hover:bg-red-50 hover:border-red-300 hover:text-red-600 no-modal"
+              title="Delete task" aria-label="Delete task">
+              <svg viewBox="0 0 24 24" class="h-[16px] w-[16px]" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14"/>
+              </svg>
+              <span class="sr-only">Delete</span>
+            </button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    {% if empty_message %}
+      <section class="p-6 bg-amber-50 border border-amber-200 rounded">
+        <p class="text-amber-900">{{ empty_message }}</p>
+      </section>
+    {% endif %}
+
+    <!-- =======================
+         Columns (Steps)
+         ======================= -->
+    {% for s in steps %}
+    <section id="col-{{ loop.index }}-{{ s.step_id }}" class="bg-white rounded-lg shadow-md p-4 section-col">
+      <h2 class="text-lg font-semibold border-b pb-2 text-brand-dark flex items-center">
+        <span class="col-title" data-col-name data-col-title="{{ s.title }}">{{ s.title }}</span>
+        <button type="button"
+                class="col-rename-btn ml-2 text-slate-500 hover:text-slate-700 text-sm"
+                data-action="rename-col" title="Rename column" aria-label="Rename column">✎</button>
+
+        <!-- Right aligned: calendar-day pill (JS will inject .due-pill here) -->
+        <span class="ml-auto text-sm text-brand-light"
+              data-biz-day="{{ s.day_of_month }}"
+              data-month-offset="{{ s.month_offset }}"
+              data-col-title="{{ s.title }}">
+          <!-- JS replaces with icon + <time> -->
+        </span>
+      </h2>
+
+      <!-- Add task (positioned at the top of the column) -->
+      <div class="col-footer pt-1 mb-6">
+        <div class="add-form add-form--footer" data-for="col-{{ loop.index }}-{{ s.step_id }}" style="display:none">
+          <div class="mb-2">
+            <input type="text" placeholder="Task title *" data-field="title"
+                   class="w-full border border-slate-300 rounded px-2 py-1">
+          </div>
+          <div class="row mb-2 flex gap-2">
+            <input type="text" placeholder="Assignee" data-field="assignee"
+                   class="flex-1 border border-slate-300 rounded px-2 py-1">
+            <input type="date" data-field="due"
+                   class="border border-slate-300 rounded px-2 py-1">
+          </div>
+          <div class="row mb-2 flex gap-2">
+            <select data-field="status" class="border border-slate-300 rounded px-2 py-1">
+              <option value="">(defaults to Not Started)</option>
+              <option value="notexpected">Not Expected</option>
+              <option value="progress">In Progress</option>
+              <option value="stuck">Stuck</option>
+              <option value="done">Done</option>
+            </select>
+            <input type="text" placeholder="Optional note" data-field="note"
+                   class="flex-1 border border-slate-300 rounded px-2 py-1">
+          </div>
+          
+          <!-- Recurring checkbox row (image + checkbox tight together) -->
+          <div class="row mb-2 flex items-center justify-end text-[12px] text-slate-500">
+            <div class="inline-flex items-center gap-1">
+              <img src="{{ url_for('static', filename='img/recurring.png') }}"
+                   alt=""
+                   class="h-4 w-4 pointer-events-none">
+              <label class="inline-flex items-center gap-1 cursor-pointer">
+                <input type="checkbox"
+                       data-field="is_recurring"
+                       class="h-4 w-4 rounded border-slate-300"
+                       checked>
+                <span>Recurring</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="actions flex items-center justify-end gap-2">
+            <button type="button" class="cancel rounded border border-slate-300 px-3 py-1">Cancel</button>
+            <button type="button" class="primary save btn-icon btn-icon--primary rounded bg-[var(--brand-blue)] text-white px-3 py-1"
+                    data-col="col-{{ loop.index }}-{{ s.step_id }}" aria-label="Add task">
+              <span class="inline-flex items-center gap-1">
+                <svg viewBox="0 0 24 24" class="h-[16px] w-[16px]" fill="none" stroke="currentColor" aria-hidden="true">
+                  <path d="M12 5v14M5 12h14" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <button type="button"
+                class="add-task-btn mt-2 inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                data-col="col-{{ loop.index }}-{{ s.step_id }}"
+                aria-label="Open add task form" aria-expanded="false">
+          <svg viewBox="0 0 24 24" class="h-[18px] w-[18px]" fill="none" stroke="currentColor" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" stroke-width="2" stroke-linecap="round"></path>
+          </svg>
+          <span>Add task</span>
+        </button>
+      </div>
+
+      <div class="flex-grow drop-zone space-y-3" data-col-title="{{ s.title }}">
+        <div class="text-center text-brand-light py-10 select-none empty-state">No tasks yet.</div>
+      </div>
+    </section>
+    {% endfor %}
+  </div>
+</main>
+
+<!-- =======================
+     Comments Modal
+     ======================= -->
+<div id="task-thread-modal" class="tmodal hidden">
+  <div class="tmodal__backdrop" data-close-modal></div>
+  <div class="tmodal__dialog" role="dialog" aria-modal="true" aria-labelledby="thread-title">
+    <header class="flex items-center justify-between gap-2 border-b border-slate-200 pb-3">
+      <h3 id="thread-title" class="text-lg font-semibold text-slate-800 truncate">Task Conversation</h3>
+      <button class="tmodal__close no-modal" data-close-modal aria-label="Close">✕</button>
+    </header>
+
+    <section class="mt-4 space-y-3 max-h-[50vh] overflow-y-auto"
+             id="thread-messages" aria-live="polite"></section>
+
+    <form id="thread-form" class="mt-4">
+      <label for="thread-input" class="sr-only">Add a comment</label>
+      <textarea id="thread-input"
+                class="thread-input w-full border border-slate-300 rounded px-2 py-1"
+                rows="3" placeholder="Write a comment…"></textarea>
+      <div class="mt-2 flex items-center justify-end gap-2">
+        <button type="button" class="btn-outline rounded border border-slate-300 px-3 py-1 no-modal" data-close-modal>Cancel</button>
+        <button type="submit" class="btn-primary rounded bg-[var(--brand-blue)] text-white px-3 py-1 no-modal">Post</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% else %}
+<main class="flex-grow p-6 flex items-center justify-center">
+  <div class="text-center">
+    <h1 class="text-4xl font-bold text-gray-800 mb-4">Welcome!</h1>
+    <p class="text-lg text-gray-600">
+      Please Log In or Sign Up to continue.
+    </p>
+  </div>
+</main>
+{% endif %}
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const titles = document.querySelectorAll('.col-title');
+
+  titles.forEach(function (el) {
+    const text = (el.textContent || '').trim();
+    const len = text.length;
+
+    // Tweak these thresholds to taste
+    if (len > 24 && len <= 36) {
+      // Medium-long titles: slightly smaller
+      el.classList.add('col-title--medium');
+    } else if (len > 36) {
+      // Very long titles: smaller still
+      el.classList.add('col-title--small');
+    }
+    // Shorter titles: keep base size
+  });
+});
+</script>
+
+
+{% endblock %}

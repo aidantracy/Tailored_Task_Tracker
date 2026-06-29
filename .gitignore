@@ -1,0 +1,50 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# ---- Virtual environments ----
+.venv/
+venv/
+env/
+
+# ---- Local config / databases ----
+instance/
+*.db
+*.sqlite3
+
+# ---- Environment files ----
+.env
+!.env.example
+
+# ---- Test / coverage / type-checker caches ----
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.mypy_cache/
+.pyre/
+.cache/
+
+# ---- Node / JS ----
+node_modules/
+
+# ---- Cypress (screenshots/videos from failed runs) ----
+cypress/screenshots/
+cypress/videos/
+
+# ---- Logs ----
+*.log
+
+# ---- Editors / OS cruft ----
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini

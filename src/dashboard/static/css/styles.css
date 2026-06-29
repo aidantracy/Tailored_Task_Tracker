@@ -1,0 +1,670 @@
+/* =========================
+   Acme Health System Process Tracker — styles.css
+   ========================= */
+
+/* Theme variables */
+:root{
+  --brand-blue:#00558C; --brand-light-blue:#e6f0f6; --brand-gray:#F4F7FA;
+  --brand-text-dark:#2d3748; --brand-text-light:#718096;
+
+  --status-done:#d4edda; --status-done-text:#155724;
+  --status-progress:#fff3cd; --status-progress-text:#856404;
+  --status-stuck:#fed7aa; --status-stuck-text:#c2410c;
+  --status-overdue:#f8d7da; --status-overdue-text:#721c24;
+
+  /* Not Expected (lighter + high contrast) */
+  --status-notexpected-bg:#bebec0;
+  --status-notexpected-text:#111827;
+  --status-notexpected-ring:#D1D5DB;
+
+  --brand-alert:#dc2626;
+  --brand-alert-soft:#fee2e2;
+
+  /* Scrollbar palette */
+  --scroll-thumb:#0f172a40;
+  --scroll-thumb-hover:#0f172a59;
+}
+
+/* Utility theme classes */
+.bg-brand-blue{background-color:var(--brand-blue)} .text-brand-blue{color:var(--brand-blue)}
+.bg-brand-light-blue{background-color:var(--brand-light-blue)} .bg-brand-gray{background-color:var(--brand-gray)}
+.text-brand-dark{color:var(--brand-text-dark)} .text-brand-light{color:var(--brand-text-light)}
+body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.active-link{background-color:var(--brand-light-blue);color:var(--brand-blue)}
+
+/* ===== Dashboard layout ===== */
+.section-col{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  position:relative;
+}
+.section-col .drop-zone{flex:1 1 auto; min-width:0;}
+.col-footer{margin-top:.5rem;padding-top:.5rem;border-top:none; margin-bottom:1rem;}
+.drop-zone{transition:background-color .15s ease}
+.drop-zone.drag-over{background-color:transparent;border-radius:.5rem}
+
+/* Highlight entire column when something is dragged over it */
+.section-col.drag-over{
+  background-color:var(--brand-light-blue);
+  box-shadow:0 0 0 2px var(--brand-blue);
+  transition:background-color .15s ease,box-shadow .15s ease;
+}
+
+/* If your grid wrapper uses .board-grid, ensure children can shrink */
+.board-grid,
+.board-grid > *{
+  min-width:0;
+}
+
+/* Force the column add-forms to obey our JS toggle */
+.section-col .col-footer { position: relative; z-index: 1; }
+.section-col .add-form { display: none; }
+.section-col .add-form.is-open { display: block !important; }
+
+/* Make the main board never overflow horizontally */
+#board{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+  scrollbar-color:var(--scroll-thumb-hover) transparent;
+}
+#board::-webkit-scrollbar{
+  width:8px;
+}
+#board::-webkit-scrollbar-track{
+  background:transparent;
+}
+#board::-webkit-scrollbar-thumb{
+  background:var(--scroll-thumb);
+  border-radius:9999px;
+}
+#board:hover::-webkit-scrollbar-thumb{
+  background:var(--scroll-thumb-hover);
+}
+
+/* Hide the custom top sync scrollbar (we don't want a visible horizontal bar) */
+.board-top-scroll{
+  display:none;
+}
+
+/* ===== Task card ===== */
+.task-card{
+  border:1px solid #e5e7eb; border-top-width:4px;
+  border-top-color:var(--card-accent,#e5e7eb);
+  border-radius:.75rem; box-shadow:0 1px 1px rgba(0,0,0,.04);
+  transition:background-color .2s ease,color .2s ease,border-color .2s ease,box-shadow .2s ease;
+  min-width:0;
+  max-width:500px; /* keep columns from widening too much */
+  overflow-wrap:anywhere;
+}
+
+/* Ensure the card’s main rows can shrink (prevents horizontal growth) */
+.task-card > .flex.items-start.justify-between.gap-3.p-3,
+.task-card > .px-3.pb-3{
+  min-width:0;
+}
+
+/* Whole-card green when Done */
+.task-card--done{background:var(--status-done)!important;border-color:#c7e8cf!important}
+.task-card--done [data-chip]{background:var(--status-done);color:var(--status-done-text);border-color:#c7e8cf}
+
+/* ===== Full-card backgrounds from tags/status ===== */
+.task--stuck{background:var(--status-stuck)!important;color:var(--status-stuck-text)!important}
+.task--stuck [data-statusbar]{background-color:#FB923C!important}
+.task--overdue{background:var(--status-overdue)!important;color:var(--status-overdue-text)!important}
+.task--overdue [data-statusbar]{background-color:#EF4444!important}
+
+/* Not Expected look */
+.task--notexpected{
+  background:var(--status-notexpected-bg)!important;
+  color:var(--status-notexpected-text)!important;
+  border:1px solid var(--status-notexpected-ring)!important;
+}
+.task--notexpected a,
+.task--notexpected .text-brand-dark,
+.task--notexpected .text-brand-light,
+.task--notexpected [data-chip-text],
+.task--notexpected svg{color:var(--status-notexpected-text)!important}
+.task--notexpected .text-[13px],
+.task--notexpected [data-note]{color:var(--brand-text-dark)!important}
+
+/* ===== Collapsed/mini states ===== */
+.task-card--collapsed{cursor:pointer}
+.task-card--collapsed [data-date-container],
+.task-card--collapsed [data-note],
+.task-card--collapsed [data-status-buttons] [data-set-status]{display:none!important}
+.task-card--collapsed [data-action="revert-done"]{display:inline-flex!important}
+.task-card--collapsed .flex.items-start.justify-between.gap-3.p-3{padding-bottom:.5rem}
+
+.task-card--mini{padding:0; min-width:0;}
+.task-card--mini > .flex.items-start.justify-between.gap-3.p-3{padding:.35rem .5rem}
+.task-card--mini [data-title]{font-size:13px}
+.task-card--mini [data-statusbar]{height:.5rem;margin-top:.35rem;border-radius:3px}
+.task-card--mini .px-3.pb-2{display:none!important}
+.task-card--mini .px-3.pb-3{padding:.25rem .5rem .4rem}
+.task-card--mini [data-status-buttons]{width:100%;display:flex;align-items:center;gap:.35rem}
+.task-card--mini [data-status-buttons] [data-set-status]{display:none!important}
+.task-card--mini [data-action="revert-done"]{display:inline-flex!important;padding:.15rem .4rem;font-size:11px;line-height:1;border-radius:.4rem}
+.task-card--mini [data-action="delete"]{margin-left:auto;padding:.15rem .4rem;font-size:11px;line-height:1}
+.task-card--mini [data-avatar]{width:1.1rem;height:1.1rem;font-size:9px}
+.task-card--mini [data-assignee]{max-width:6rem;font-size:12px}
+.task-card--mini [data-comment-indicator]{opacity:1;transform:translateY(-1px)}
+
+/* While a card is being dragged */
+.task-card.dragging{
+  opacity:.7;
+  box-shadow:0 0 0 2px var(--brand-blue);
+  cursor:grabbing;
+}
+
+/* ===== Indicators ===== */
+.note-indicator,comment-indicator{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px}
+.note-indicator{color:#f59e0b}
+.comment-indicator{color:#0f172a}
+
+/* Overdue chip */
+.overdue-chip{
+  display:inline-flex;align-items:center;gap:.35rem;padding:.125rem .5rem;border-radius:9999px;
+  background:var(--status-overdue);color:var(--status-overdue-text);border:1px solid #eeb1b6;font-size:12px;
+}
+
+/* ===== Title clipping + tooltip ===== */
+.title-clip{
+  display:inline-block;max-width:100%;min-width:0;
+  white-space:normal!important;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  max-inline-size:min(42ch,100%);
+}
+.title-clip[data-tooltip]:hover::after{
+  content:attr(data-tooltip);position:absolute;left:0;top:calc(100% + 6px);z-index:40;white-space:normal;max-width:24rem;
+  line-height:1.3;background:#0f172a;color:#fff;border-radius:.5rem;padding:.5rem .625rem;box-shadow:0 10px 25px rgba(0,0,0,.2);
+}
+.title-clip[data-tooltip]:hover::before{
+  content:"";position:absolute;left:10px;top:calc(100% + 1px);width:8px;height:8px;background:#0f172a;transform:rotate(45deg);z-index:39;
+}
+
+/* ===== Bottom add button ===== */
+.add-task-btn--circle{
+  width:2.75rem;height:2.75rem;border-radius:9999px;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;
+  border:1px solid #cbd5e1;background:#fff;color:var(--brand-blue);box-shadow:0 1px 0 rgba(0,0,0,.03);
+  transition:transform .05s ease,box-shadow .15s ease,background-color .15s ease,border-color .15s ease;
+}
+.add-task-btn--circle:hover{background:var(--brand-light-blue);border-color:#94a3b8}
+.add-task-btn--circle:active{transform:translateY(1px)}
+.add-task-btn--circle:focus{outline:none;box-shadow:0 0 0 3px rgba(0,85,140,.2)}
+.add-task-btn--circle svg{width:1.25rem;height:1.25rem}
+
+/* ===== Inline add form ===== */
+.add-form{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:.75rem;padding:.75rem}
+.add-form input,add-form select{width:100%;border:1px solid #e5e7eb;border-radius:.5rem;padding:.5rem .625rem;font-size:.875rem}
+.add-form .row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.add-form .actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:.5rem}
+.btn-icon{width:2.5rem;height:2.5rem;display:inline-flex;align-items:center;justify-content:center;border-radius:.625rem;border:1px solid transparent;background:#fff;color:var(--brand-blue)}
+.btn-icon--primary{background:var(--brand-blue);color:#fff;border-color:var(--brand-blue);box-shadow:0 1px 0 rgba(0,0,0,.05)}
+.btn-icon--primary:hover{background:#024a79;border-color:#024a79}
+.btn-icon--primary:active{transform:translateY(1px)}
+.btn-icon--primary:focus{outline:none;box-shadow:0 0 0 3px rgba(0,85,140,.25)}
+.btn-icon svg{width:1.1rem;height:1.1rem}
+
+/* ===== Popovers ===== */
+.date-popover,
+.assignee-popover{
+  position:absolute;right:0;top:120%;
+  background:#fff;border:1px solid #e5e7eb;border-radius:.5rem;padding:.5rem;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);z-index:10
+}
+.date-input,& .assignee-input{
+  border:1px solid #e5e7eb;border-radius:.375rem;padding:.25rem .5rem;font-size:.875rem;width:100%
+}
+.date-save,.date-cancel,.assignee-save,.assignee-cancel{
+  border:1px solid #e5e7eb;border-radius:.375rem;padding:.25rem .5rem;font-size:.8125rem;background:#fff
+}
+.date-save:hover,.assignee-save:hover{background:var(--brand-light-blue)}
+.date-cancel:hover,.assignee-cancel:hover{background:#f8fafc}
+.assignee-click{cursor:pointer}
+
+/* icon-only ✓ / ✕ for due date save/cancel */
+.date-save,.date-cancel{
+  position:relative;
+  font-size:0;
+}
+.date-save::before,
+.date-cancel::before{
+  font-size:.9rem;
+  line-height:1;
+}
+.date-save::before{
+  content:"\2713";
+  color:#16a34a;
+}
+.date-cancel::before{
+  content:"\2715";
+  color:#dc2626;
+}
+
+/* ===== Modal ===== */
+.tmodal.hidden{display:none}
+.tmodal{position:fixed;inset:0;z-index:50}
+.tmodal__backdrop{position:absolute;inset:0;background:transparent}
+.tmodal__dialog{position:relative;margin:5vh auto 0;width:min(900px,92vw);background:#fff;border-radius:.75rem;padding:1rem;box-shadow:0 25px 60px rgba(0,0,0,.25);max-height:90vh;overflow:hidden;border:1px solid #e5e7eb}
+.tmodal__close{border:1px solid #e5e7eb;border-radius:.5rem;padding:.25rem .5rem;background:#fff}
+.tmodal__close:hover{background:#f8fafc}
+
+/* Done modal accent */
+.tmodal--done{border-color:#c7e8cf;box-shadow:0 25px 60px rgba(21,87,36,.25)}
+.tmodal--done header{background:var(--status-done);border:1px solid #c7e8cf;border-radius:.5rem;padding:.5rem .75rem}
+.tmodal--done #thread-title{color:var(--status-done-text)}
+
+/* Not Expected modal accent */
+.tmodal--notexpected{border-color:#D1D5DB}
+.tmodal--notexpected header{
+  background:#E5E7EB;border:1px solid #D1D5DB;border-radius:.5rem;padding:.5rem .75rem;
+}
+.tmodal--notexpected #thread-title{color:#111827}
+
+/* ===== Thread composer ===== */
+.thread-input{width:100%;resize:vertical;border:1px solid #e5e7eb;border-radius:.5rem;padding:.5rem .625rem;font-size:.875rem}
+.btn-primary{background:var(--brand-blue);color:#fff;border:1px solid var(--brand-blue);border-radius:.5rem;padding:.4rem .8rem;font-size:.875rem}
+.btn-primary:hover{background:#024a79;border-color:#024a79}
+.btn-outline{background:#fff;color:#0f172a;border:1px solid #e5e7eb;border-radius:.5rem;padding:.4rem .8rem;font-size:.875rem}
+.btn-outline:hover{background:#f8fafc}
+
+/* ===== Chat bubbles ===== */
+.msg-row{display:flex;min-width:0;width:100%}
+.msg-left{justify-content:flex-start}
+.msg-right{justify-content:flex-end}
+.msg-bubble{
+  max-width:78%;
+  min-width:0;
+  border-radius:1rem;
+  padding:.5rem .75rem;
+  box-shadow:0 1px 1px rgba(0,0,0,.04);
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+.bubble-other{background:#f8fafc;color:#0f172a;border:1px solid #e5e7eb}
+.bubble-you{background:var(--brand-light-blue);color:#0f172a;border:1px solid #cfe0ec}
+.msg-text{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+.msg-meta{margin-top:.25rem;font-size:.72rem;color:#64748b;text-align:right}
+
+/* Revert button */
+.revert-btn{background:#fff}
+.revert-btn:hover{background:#eaffef;border-color:#68d391;color:#155724}
+
+/* Utility */
+.hidden{display:none!important}
+
+/* Compact single-line layout helpers */
+.task-row{display:flex;align-items:center;gap:.5rem;flex-wrap:nowrap; min-width:0;}
+.task-row .task-main{display:flex;align-items:center;gap:.5rem;flex:1 1 auto;min-width:0}
+.task-row .task-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap; min-width:0;}
+.task-row .revert-btn{flex:0 0 auto;margin-left:auto;padding:.25rem .5rem;line-height:1;font-size:.75rem;border:1px solid var(--brand-light-blue);color:var(--brand-blue);background:#fff}
+.task-row .revert-btn:hover{background:var(--brand-light-blue)}
+
+/* footer */
+footer { display:flex; justify-content:center; align-items:center; padding:20px 0; }
+.footer-logo { height:40px; width:auto; border-radius:8px; }
+
+/* ---- comment indicator on task cards ---- */
+.task-card [data-comment-indicator] { display:none; position:relative; transition:opacity .15s ease, transform .15s ease, color .15s ease; }
+.task-card.has-comments [data-comment-indicator] { display:inline-flex; }
+.task-card.has-new [data-comment-indicator] { opacity:1; }
+.task-card [data-comment-indicator] .ping-dot { display:none; width:6px; height:6px; border-radius:9999px; background:currentColor; }
+.task-card.has-new [data-comment-indicator] .ping-dot { display:inline-block; }
+.task-card [data-unread-count], .task-card [data-comment-count]{
+  position:absolute; top:-6px; right:-6px; min-width:16px; height:16px; padding:0 4px; border-radius:9999px; font-size:10px; line-height:16px; text-align:center; color:#fff; background:#e11d48;
+}
+.task-card [data-unread-count]:empty, .task-card [data-comment-count]:empty { display:none; }
+
+/* ===== Modal comment icon ===== */
+.comment-icon { position:relative; display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:9999px; color:#334155; background:#f1f5f9; }
+.comment-icon svg { width:20px; height:20px; }
+.comment-icon.comment-unread { color:#dc2626; background:#fee2e2; }
+.comment-badge { position:absolute; top:-6px; right:-6px; min-width:16px; height:16px; padding:0 4px; border-radius:9999px; font-size:10px; line-height:16px; text-align:center; color:#fff; background:#e11d48; }
+.comment-badge:empty { display:none; }
+.task-card [data-comment-indicator].comment-unread { color:#dc2626; }
+
+/* ───────────────────────────────────────────────────────────────────────
+   Add-note pill tray & note area (hover only, no card jitter)
+   ─────────────────────────────────────────────────────────────────────── */
+
+/* The tray reserves a little space so card height is stable,
+   even when the pill is invisible. */
+.note-cta-tray{
+  margin-top:.2rem;
+  min-height:24px;           /* reserve space for the pill */
+  display:flex;
+  align-items:center;
+}
+
+/* Pill defaults to hidden; only appears on hover via opacity,
+   not via height changes. */
+.note-add-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+  padding:.15rem .55rem;
+  border-radius:9999px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  color:var(--brand-blue);
+  font-size:12px;
+  line-height:1;
+  box-shadow:0 1px 0 rgba(0,0,0,.03);
+
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(0);
+  transition:
+    opacity .18s ease,
+    background-color .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease,
+    transform .1s ease;
+}
+
+.note-add-btn svg{
+  width:14px;
+  height:14px;
+}
+
+/* Show pill when the card is hovered, but without changing tray height */
+.task-card:hover .note-add-btn{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.note-add-btn:hover{
+  background:var(--brand-light-blue);
+  border-color:#cbd5e1;
+  transform:translateY(-0.5px);
+}
+
+/* Note content area – just a normal block; no max-height animation */
+.note-area{
+  position:relative;
+  margin-top:.25rem;
+  overflow:hidden;
+}
+
+.note-area.open{
+  max-height:none;
+  opacity:1;
+}
+
+
+/* Inline note edit controls (✓ / ×) */
+.note-edit-actions{
+  position:absolute; top:4px; right:4px;
+  display:flex; gap:6px; z-index:1; flex-wrap: wrap;
+}
+.note-btn{
+  width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center;
+  border:1px solid #e5e7eb; border-radius:6px; background:#fff;
+  box-shadow:0 1px 0 rgba(0,0,0,.03);
+}
+.note-btn svg{ width:16px; height:16px; }
+.note-btn--save{ color:#16a34a; border-color:#bbf7d0; background:#f0fdf4; }
+.note-btn--save:hover{ background:#dcfce7; }
+.note-btn--cancel{ color:#dc2626; border-color:#fecaca; background:#fff1f2; }
+.note-btn--cancel:hover{ background:#fee2e2; }
+
+/* CRITICAL: Wrap/clamp notes so they grow vertically, not horizontally */
+.task-card [data-note],
+.task-card [data-note].truncate,
+.task-card .truncate[data-note],
+.task-card [data-note].whitespace-nowrap,
+.task-card .whitespace-nowrap[data-note]{
+  display:-webkit-box !important;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+
+  white-space:normal !important;
+  word-break:break-word !important;
+  overflow-wrap:anywhere !important;
+
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+
+  max-inline-size: min(42ch, 100%) !important;
+
+  line-height:1.25;
+  max-height: calc(1.25rem * 3);
+}
+
+/* Make the editing textarea wrap too (no horizontal growth) */
+.note-area textarea{
+  width:100%;
+  resize:vertical;
+  white-space:pre-wrap !important;
+  word-break:break-word !important;
+  overflow-wrap:anywhere !important;
+  max-inline-size: min(56ch, 100%) !important;
+}
+
+/* ── Card note (display) — wrap & clamp, but don't widen the column ── */
+#board .task-card [data-note]{
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+  line-height:1.25;
+  overflow:hidden;
+  text-overflow:ellipsis;
+
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+
+  max-inline-size:min(42ch,100%);
+  contain:inline-size;
+}
+
+/* ── Note textarea (editing) — wider measure while typing, still bounded ── */
+#board .task-card .note-area textarea{
+  width:100%;
+  resize:vertical;
+
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+
+  max-inline-size:min(56ch,100%);
+  contain:inline-size;
+}
+
+/* === Icon-only due date buttons (✓ / ✕) === */
+.date-save,
+.date-cancel{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:row !important;
+  width:1.9rem;
+  height:1.9rem;
+  padding:0;
+  gap:0;
+
+  font-size:0;
+  color:transparent;
+}
+.date-save > *,
+.date-cancel > *{
+  display:none !important;
+}
+.date-save::before,
+.date-cancel::before{
+  font-size:.9rem;
+  line-height:1;
+}
+.date-save::before{
+  content:"\2713";
+  color:#16a34a;
+}
+.date-cancel::before{
+  content:"\2715";
+  color:#dc2626;
+}
+
+/* ─── Column Due-Date Pill ─────────────────────────────────────────────── */
+/* Smaller + more subtle so the icon doesn't feel huge */
+.due-pill{
+  display:inline-flex; align-items:center; gap:.3rem;
+  padding:.1rem .45rem; border-radius:9999px;
+  border:1px solid var(--sl-border, #e5e7eb);
+  background:#f8fafc; color:#475569; line-height:1;
+  font-size:.75rem;
+}
+.due-pill--next{
+  background:#eef2ff;
+  border-color:#c7d2fe;
+  color:#4f46e5;
+}
+.due-pill .due-icon{
+  width:12px;
+  height:12px;
+  opacity:.8;
+}
+.due-pill time{
+  font-variant-numeric: tabular-nums;
+}
+.due-pill[data-rolled="1"]::after{
+  content:"↷";
+  font-size:.7rem;
+  margin-left:.15rem;
+  opacity:.7;
+}
+
+/* ── Right-align the column due-date pill ─────────────────────────────── */
+.section-col > h2{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+}
+.section-col > h2 [data-biz-day]{
+  margin-left:auto !important;
+  white-space:nowrap;
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+   Column titles: prefer one line, but allow wrapping
+   ─────────────────────────────────────────────────────────────────────── */
+
+/* Base column title */
+.col-title{
+  display:block;
+  font-size:1.125rem !important;  /* ~18px */
+  font-weight:600;
+  line-height:1.2;
+
+  /* allow wrapping so long titles don't get cut off */
+  white-space:normal;
+  word-break:break-word;
+}
+
+/* Slightly smaller for medium-long titles */
+.col-title--medium{
+  font-size:1rem !important;      /* ~16px */
+}
+
+/* Smaller for very long titles */
+.col-title--small{
+  font-size:0.9rem !important;    /* ~14px */
+}
+
+
+
+
+
+/* footer */
+footer { display:flex; justify-content:center; align-items:center; padding:20px 0; }
+.footer-logo { height:40px; width:auto; border-radius:8px; }
+
+/* Month selector hover/focus polish (unused ids are harmless) */
+#month-select {
+  transition: all 0.15s ease-in-out;
+}
+#month-select:hover {
+  border-color: #4f83ff;
+}
+#current-month-label {
+  letter-spacing: 0.3px;
+}
+
+
+/* ───────────────────────────────────────────────────────────────────────
+   Compact task-card layout + no hover jitter
+   ─────────────────────────────────────────────────────────────────────── */
+
+/* Hard override: never animate the note tray on hover */
+.task-card:hover .note-cta-tray{
+  max-height:none !important;
+}
+.task-card:hover .note-add-btn{
+  opacity:1 !important;
+  pointer-events:auto !important;
+}
+
+/* Thin out padding + gaps inside the card */
+.task-card .p-3{
+  padding:0.5rem !important;          /* default .75rem -> .5rem */
+}
+.task-card .px-3{
+  padding-left:0.5rem !important;
+  padding-right:0.5rem !important;
+}
+.task-card .pb-3{
+  padding-bottom:0.5rem !important;
+}
+.task-card .pb-2{
+  padding-bottom:0.25rem !important;
+}
+.task-card .mt-2{
+  margin-top:0.25rem !important;
+}
+.task-card .gap-3{
+  gap:0.5rem !important;
+}
+
+/* Slightly smaller text so cards read tighter */
+.task-card h3{
+  font-size:0.9rem !important;        /* ~14px */
+}
+.task-card [data-note]{
+  font-size:0.78rem !important;       /* ~12.5px */
+}
+.task-card [data-chip-text],
+.task-card [data-assignee],
+.task-card [data-due]{
+  font-size:0.8rem !important;
+}
+
+/* Compact status button row */
+.task-card [data-status-buttons]{
+  margin-top:0.25rem !important;
+}
+
+/* Keep the add-note tray small + stable */
+.note-cta-tray{
+  margin-top:0.2rem !important;
+}
+
+/* Note textarea also a bit tighter */
+.note-area textarea{
+  padding:0.35rem 0.5rem !important;
+  font-size:0.8rem !important;
+}
+
+/* Disable title tooltip hover to avoid layout jitter */
+.title-clip[data-tooltip]:hover::after,
+.title-clip[data-tooltip]:hover::before{
+  content:none !important;
+}

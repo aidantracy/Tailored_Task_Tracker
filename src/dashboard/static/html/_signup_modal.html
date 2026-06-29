@@ -1,0 +1,61 @@
+<div id="signup-modal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-3xl relative">
+
+        <button class="close-modal-btn absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+
+        <h2 class="text-2xl font-bold text-center mb-6 text-brand-dark">Welcome to LedgerLine</h2>
+
+        <form id="signup-form" novalidate class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div>
+                <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <input type="text" id="first_name" name="first_name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue" placeholder="John" data-cy="first-name">
+            </div>
+
+            <div>
+                <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <input type="text" id="last_name" name="last_name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue" placeholder="Doe" data-cy="last-name">
+            </div>
+
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                <input type="email" id="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue" placeholder="you@example.com" data-cy="signup-email">
+                <span id="email-error" class="error-message text-red-500 text-sm"></span>
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" id="password" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue" placeholder="••••••••" data-cy="signup-password">
+                <span id="password-error" class="error-message text-red-500 text-sm"></span>
+            </div>
+
+            <div class="md:col-span-2">
+                <label for="invitation_key" class="block text-sm font-medium text-gray-700 mb-1">Invitation Key</label>
+                <input type="text" id="invitation_key" name="invitation_key" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue" placeholder="Enter your invitation key" data-cy="invitation-key">
+                <span id="invitation-key-error" class="error-message text-red-500 text-sm"></span>
+            </div>
+
+            <div class="mb-4">
+                <label for="security_question" class="block text-sm font-medium text-gray-700 mb-1">Security Question</label>
+                <select id="security_question" name="security_question" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                    <option value="" disabled selected>Select a question...</option>
+                    <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                    <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+                    <option value="What city were you born in?">What city were you born in?</option>
+                </select>
+            </div>
+
+            <div class="mb-6">
+                <label for="security_answer" class="block text-sm font-medium text-gray-700 mb-1">Security Answer</label>
+                <input type="text" id="security_answer" name="security_answer" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue" placeholder="Answer">
+            </div>
+
+            <button type="submit" class="w-full bg-brand-blue text-white py-2 rounded-md hover:bg-opacity-90 transition font-semibold" data-cy="signup-submit-button">
+                Sign Up
+            </button>
+            <span id="form-error" class="error-message"></span>
+        </form>
+
+    </div>
+</div>

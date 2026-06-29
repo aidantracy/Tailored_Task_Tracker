@@ -1,0 +1,4 @@
+# This file tells setuptools what non-Python files to include in the package.
+# Without this, our templates and static assets would be missing after installation.
+recursive-include src/dashboard/templates *
+recursive-include src/dashboard/static *

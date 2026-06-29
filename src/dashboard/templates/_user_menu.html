@@ -1,0 +1,40 @@
+{# templates/_user_menu.html #}
+{% if current_user.is_authenticated %}
+<div class="relative">
+  <button id="user-menu-trigger"
+          class="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-white shadow-sm hover:shadow transition"
+          type="button" aria-haspopup="menu" aria-expanded="false">
+    <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 font-medium">
+      {{ (current_user.first_name[:1] ~ current_user.last_name[:1]) if current_user.first_name and current_user.last_name else "U" }}
+    </span>
+    <svg class="h-4 w-4 opacity-70" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 011.08 1.04l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+    </svg>
+  </button>
+
+  <div id="user-menu"
+       class="hidden absolute right-0 mt-2 w-48 rounded-lg border bg-white shadow-lg overflow-hidden z-50"
+       role="menu" aria-labelledby="user-menu-trigger">
+    <div class="px-3 py-2 text-sm text-slate-600 border-b">
+      {{ current_user.first_name }} {{ current_user.last_name }}
+    </div>
+        <a id="logout-link"
+        href="{{ url_for('auth_bp.logout') }}"
+        class="block px-3 py-2 text-sm hover:bg-slate-50"
+        role="menuitem"
+        data-cy="logout-button">
+        Log out
+        </a>
+
+  </div>
+</div>
+{% else %}
+<div class="flex items-center gap-2">
+  <button id="open-login" class="px-3 py-1.5 rounded-md bg-white border hover:bg-slate-50" type="button">
+    Log in
+  </button>
+  <button id="open-signup" class="px-3 py-1.5 rounded-md bg-blue-600 text-white hover:bg-blue-700" type="button">
+    Sign up
+  </button>
+</div>
+{% endif %}

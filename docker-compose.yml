@@ -1,0 +1,38 @@
+services:
+  app:
+    image: localhost/dashboard-app:dev  
+    build:
+      context: .
+    pull_policy: never            
+    container_name: dashboard-app
+    env_file: .env
+    environment:
+      PYTHONPATH: /app/src
+      FLASK_ENV: development
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${HOST_PORT:-5000}:5000"
+    volumes:
+      - .:/app
+    command: ["python", "run.py"]
+
+  db:
+    image: mysql:8.4
+    container_name: dashboard-mysql
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${MYSQL_ROOT_PASSWORD} || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  mysql_data:

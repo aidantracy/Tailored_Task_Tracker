@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Page{% endblock %}
+
+{% block content %}
+<div class="flex flex-col h-screen">
+
+    <div class="flex flex-grow overflow-hidden">
+
+        <aside class="w-64 bg-white p-4 border-r border-brand-gray flex-shrink-0">
+            <nav>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="#" id="nav-invitation-keys" class="nav-link active-link flex items-center px-4 py-2 text-brand-dark rounded-md font-semibold" data-target="view-invitation-keys">
+                            Invitation Keys
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" id="nav-delete-users" class="nav-link flex items-center px-4 py-2 text-brand-dark rounded-md font-semibold" data-target="view-delete-users">
+                            Delete Users
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" id="nav-promote-users" class="nav-link flex items-center px-4 py-2 text-brand-dark rounded-md font-semibold" data-target="view-promote-users">
+                            Promote Admins
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" id="nav-revoke-admins" class="nav-link flex items-center px-4 py-2 text-brand-dark rounded-md font-semibold" data-target="view-revoke-admins">
+                            Revoke Admin
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+
+        <main class="flex-grow p-6 overflow-auto">
+
+            <div id="view-invitation-keys" class="content-view">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Available Invitation Keys</h2>
+                    <button id="generate-key-btn" class="bg-brand-blue text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-opacity-90">
+                        Generate New Key
+                    </button>
+                </div>
+                <p class="text-gray-600 text-sm mt-1">Generate new invitation keys that are required for new users to sign up. Please send this code to new users that you trust and in a secure manner.</p>
+                <p id="key-gen-error" class="error-message mb-4"></p>
+
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <ul id="keys-list" class="divide-y divide-gray-200">
+                        <li class="px-6 py-4 text-center text-gray-500">Loading keys...</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="view-delete-users" class="content-view hidden">
+                <div class="mb-4">
+                    <h2 class="text-2xl font-bold">Delete Users</h2>
+                    <p class="text-gray-600 text-sm mt-1">Permanently remove access for users. This action cannot be easily undone.</p>
+                </div>
+
+                <p id="delete-error" class="error-message mb-4 text-red-600"></p>
+                <p id="delete-success" class="success-message mb-4 text-green-600"></p>
+
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody id="delete-list" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                                    Click 'Delete Users' tab to load users.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-promote-users" class="content-view hidden">
+                <div class="mb-4">
+                    <h2 class="text-2xl font-bold">Promote Users to Admin</h2>
+                    <p class="text-gray-600 text-sm mt-1">Select a user below to grant them administrative privileges.</p>
+                </div>
+
+                <p id="promote-error" class="error-message mb-4 text-red-600"></p>
+                <p id="promote-success" class="success-message mb-4 text-green-600"></p>
+
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody id="candidates-list" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">
+                                    Click 'Promote Admins' tab to load users.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-revoke-admins" class="content-view hidden">
+                <div class="mb-4">
+                    <h2 class="text-2xl font-bold">Revoke Admin Privileges</h2>
+                    <p class="text-gray-600 text-sm mt-1">Select an admin below to revert them to a standard user.</p>
+                </div>
+
+                <p id="revoke-error" class="error-message mb-4 text-red-600"></p>
+                <p id="revoke-success" class="success-message mb-4 text-green-600"></p>
+
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody id="admins-list" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">
+                                    Click 'Revoke Admin' tab to load users.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-promote-users" class="content-view hidden">
+                <div class="mb-4">
+                    <h2 class="text-2xl font-bold">Promote Users to Admin</h2>
+                    <p class="text-gray-600 text-sm mt-1">Select a user below to grant them administrative privileges.</p>
+                </div>
+
+                <p id="promote-error" class="error-message mb-4 text-red-600"></p>
+                <p id="promote-success" class="success-message mb-4 text-green-600"></p>
+
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody id="candidates-list" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">
+                                    Click 'Promote Admins' tab to load users.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-revoke-admins" class="content-view hidden">
+                <div class="mb-4">
+                    <h2 class="text-2xl font-bold">Revoke Admin Privileges</h2>
+                    <p class="text-gray-600 text-sm mt-1">Select an admin below to revert them to a standard user.</p>
+                </div>
+
+                <p id="revoke-error" class="error-message mb-4 text-red-600"></p>
+                <p id="revoke-success" class="success-message mb-4 text-green-600"></p>
+
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody id="admins-list" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">
+                                    Click 'Revoke Admin' tab to load users.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+{% endblock %}

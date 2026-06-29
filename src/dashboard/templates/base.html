@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}My Application{% endblock %}</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="bg-brand-gray text-brand-dark" style="font-family: 'Inter', sans-serif;">
+
+<header class="bg-white shadow-sm p-4 flex justify-between items-center border-b-2 border-brand-gray">
+  <div class="flex items-center space-x-3">
+    <a href="{{ url_for('dashboard_bp.index') }}" class="bg-brand-blue text-white w-10 h-10 flex items-center justify-center rounded-md font-bold text-lg">AH</a>
+    <h1 class="text-2xl font-bold text-brand-blue">Process Tracker</h1>
+  </div>
+
+  <div class="flex items-center space-x-2">
+    {% if current_user.is_authenticated %}
+
+      {# ===========================================================
+         MONTH DROPDOWN - HIDDEN WHEN hide_month_picker=True
+         =========================================================== #}
+      {% if not hide_month_picker|default(false) %}
+      <div class="relative">
+        <div class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 transition
+                    px-4 py-2 rounded-full cursor-pointer border border-slate-200">
+          <!-- Calendar icon -->
+          <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8 2v3m8-3v3M3 10h18M5 6h14a2 2 0 012 2v11a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z"/>
+          </svg>
+
+          <!-- Current month label -->
+          <span id="header-month-label" class="font-medium text-slate-700 text-sm">
+            Loading…
+          </span>
+
+          <!-- Chevron -->
+          <svg class="h-4 w-4 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+                  d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 011.08 1.04l-4.25 4.25a.75.75 0 
+                  01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                  clip-rule="evenodd" />
+          </svg>
+        </div>
+
+        <!-- Invisible native select (header-specific id to avoid conflicts) -->
+        <select id="header-month-select"
+                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+        </select>
+      </div>
+      {% endif %}
+
+      {% if current_user.is_admin %}
+          <a href="{{ url_for('dashboard_bp.admin') }}"
+             id="admin-link"
+             class="bg-brand-light-blue px-4 py-2 rounded-md hover:bg-opacity-90 transition inline-block">
+            Admin
+          </a>
+      {% endif %}
+
+      {% set fn = current_user.first_name or '' %}
+      {% set ln = current_user.last_name or '' %}
+      {% set initials = (fn[:1] ~ ln[:1]) if (fn or ln) else 'U' %}
+      <div class="relative">
+        <button id="user-menu-trigger"
+                class="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-slate-50 transition"
+                type="button" aria-haspopup="menu" aria-expanded="false" data-cy="user-menu-trigger">
+          <div class="w-8 h-8 bg-brand-light-blue text-brand-blue flex items-center justify-content-center rounded-full font-bold border-2 border-brand-blue">
+            {{ initials }}
+          </div>
+          <svg class="h-4 w-4 opacity-70" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 011.08 1.04l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+          </svg>
+        </button>
+
+        <div id="user-menu"
+             class="hidden absolute right-0 mt-2 w-48 rounded-lg border bg-white shadow-lg overflow-hidden z-50"
+             role="menu" aria-labelledby="user-menu-trigger">
+          <div class="px-3 py-2 text-sm text-slate-600 border-b">
+            {{ fn }} {{ ln }}
+          </div>
+
+          <a href="{{ url_for('dashboard_bp.settings') }}"
+           class="block px-3 py-2 text-sm text-brand-dark hover:bg-slate-50 transition"
+           role="menuitem">
+            Settings
+          </a>
+
+          <a id="logout-link"
+             href="{{ url_for('auth_bp.logout') }}"
+             class="block px-3 py-2 text-sm hover:bg-slate-50"
+             role="menuitem" data-cy="logout-button">
+            Log out
+          </a>
+        </div>
+      </div>
+    {% else %}
+      <div class="flex items-center space-x-4">
+        <button id="login-btn"
+                class="modal-trigger bg-brand-blue text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition"
+                data-modal-url="{{ url_for('static', filename='html/_login_modal.html') }}"
+                data-cy="login-modal-button">
+          Log in
+        </button>
+        <button id="signin-btn"
+                class="modal-trigger bg-brand-light-blue px-4 py-2 rounded-md hover:bg-opacity-90 transition"
+                data-modal-url="{{ url_for('static', filename='html/_signup_modal.html') }}"
+                data-cy="signup-modal-button">
+          Sign Up
+        </button>
+      </div>
+    {% endif %}
+  </div>
+</header>
+
+{% block content %}{% endblock %}
+
+<div id="modal-container"></div>
+
+<footer>
+    <a href="https://sdp.boisestate.edu" target="_blank">
+        <img class="footer-logo" src="{{ url_for('static', filename='img/sdp-logo-3.png') }}" alt="The Senior Design Project logo from Boise State University's Computer Science Department.">
+    </a>
+</footer>
+
+<script type="module" src="{{ url_for('static', filename='js/board.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/user_menu.js') }}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const select = document.getElementById('header-month-select');
+  const label  = document.getElementById('header-month-label');
+
+  // If the picker is hidden (e.g., admin page), bail out.
+  if (!select || !label) return;
+
+  // Hard minimum: November 2025
+  const MIN_YEAR  = 2025;
+  const MIN_MONTH = 11; // November (1–12)
+
+  // From dashboard.py: e.g., "2025-11"
+  const currentKey = {{ current_month_key|default(None)|tojson|safe }};
+
+  let selectedYear = null;
+  let selectedMonth = null;
+
+  if (currentKey) {
+    const parts = String(currentKey).split('-');
+    if (parts.length >= 2) {
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10);
+      if (!Number.isNaN(y) && !Number.isNaN(m) && m >= 1 && m <= 12) {
+        selectedYear = y;
+        selectedMonth = m;
+      }
+    }
+  }
+
+  // Fallback to today's year/month if current_key isn't valid
+  if (!selectedYear || !selectedMonth) {
+    const today = new Date();
+    selectedYear = today.getFullYear();
+    selectedMonth = today.getMonth() + 1; // 1–12
+  }
+
+  // Clamp to at least November 2025
+  if (selectedYear < MIN_YEAR) {
+    selectedYear = MIN_YEAR;
+    selectedMonth = Math.max(selectedMonth, MIN_MONTH);
+  } else if (selectedYear === MIN_YEAR && selectedMonth < MIN_MONTH) {
+    selectedMonth = MIN_MONTH;
+  }
+
+  const monthNames = [
+    'January', 'February', 'March',
+    'April',   'May',      'June',
+    'July',    'August',   'September',
+    'October', 'November', 'December'
+  ];
+
+  // Build month options from MIN (Nov 2025) up to:
+  // max(current board month, today + horizon)
+  const today = new Date();
+  const horizonMonthsAhead = 24; // 2 years ahead of today
+  const horizonDate = new Date(today.getFullYear(), today.getMonth() + horizonMonthsAhead, 1);
+
+  function toTotalMonths(year, month1to12) {
+    return year * 12 + (month1to12 - 1);
+  }
+
+  const minTotal    = toTotalMonths(MIN_YEAR, MIN_MONTH);
+  const boardTotal  = toTotalMonths(selectedYear, selectedMonth);
+  const horizonTotal = toTotalMonths(horizonDate.getFullYear(), horizonDate.getMonth() + 1);
+
+  const maxTotal = Math.max(boardTotal, horizonTotal);
+
+  select.innerHTML = '';
+
+  let foundCurrent = false;
+
+  for (let total = minTotal; total <= maxTotal; total++) {
+    const year = Math.floor(total / 12);
+    const monthIndex = total % 12; // 0–11
+    const month1to12 = monthIndex + 1;
+
+    const value = `${year}-${String(month1to12).padStart(2, '0')}`;
+    const text  = `${monthNames[monthIndex]} ${year}`;
+
+    const opt = document.createElement('option');
+    opt.value = value;
+    opt.textContent = text;
+
+    if (currentKey && value === currentKey) {
+      opt.selected = true;
+      label.textContent = text;
+      foundCurrent = true;
+    }
+
+    select.appendChild(opt);
+  }
+
+  // If currentKey wasn't in range (for some reason), select the last option
+  if (!foundCurrent) {
+    const last = select.options[select.options.length - 1];
+    if (last) {
+      last.selected = true;
+      label.textContent = last.textContent;
+    } else {
+      label.textContent = 'Select month';
+    }
+  }
+
+  select.addEventListener('change', function () {
+    const opt = select.options[select.selectedIndex];
+    if (!opt) return;
+
+    label.textContent = opt.textContent || 'Select month';
+
+    const selectedValue = opt.value; // YYYY-MM
+    if (selectedValue) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('month', selectedValue);
+      window.location.href = url.toString();
+    }
+  });
+});
+</script>
+
+</body>
+</html>

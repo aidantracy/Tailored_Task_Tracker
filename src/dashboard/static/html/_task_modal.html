@@ -1,0 +1,62 @@
+<div id="task-modal" class="fixed inset-0 bg-black/40 hidden z-50">
+  <div class="min-h-full w-full grid place-items-center p-4">
+    <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-3 border-b">
+        <h2 class="text-lg font-semibold text-brand-dark">Create Task</h2>
+        <button class="text-brand-light hover:text-brand-dark" data-close aria-label="Close">✕</button>
+      </div>
+
+      <form id="task-form" class="p-5 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label class="block">
+            <span class="text-sm text-brand-light">Title <span class="text-red-500">*</span></span>
+            <input name="title" type="text" required class="mt-1 w-full border rounded-lg px-3 py-2">
+          </label>
+
+          <label class="block">
+            <span class="text-sm text-brand-light">Due date <span class="text-red-500">*</span></span>
+            <input name="due_date" type="date" required class="mt-1 w-full border rounded-lg px-3 py-2">
+          </label>
+
+          <label class="block md:col-span-2">
+            <span class="text-sm text-brand-light">Description (optional)</span>
+            <textarea name="description" rows="3" class="mt-1 w-full border rounded-lg px-3 py-2"></textarea>
+          </label>
+
+          <label class="block">
+            <span class="text-sm text-brand-light">Assignee (optional)</span>
+            <input name="assignee" type="text" class="mt-1 w-full border rounded-lg px-3 py-2">
+          </label>
+
+          <label class="block">
+            <span class="text-sm text-brand-light">Status</span>
+            <select name="status_id" class="mt-1 w-full border rounded-lg px-3 py-2">
+              <option value="1">To Do</option>
+              <option value="2" selected>In Progress</option>
+              <option value="3">Blocked</option>
+              <option value="4">Done</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label class="block">
+            <span class="text-sm text-brand-light">Step/Column</span>
+                <select name="column_id" class="mt-1 w-full border rounded-lg px-3 py-2">
+                    <option value="col-populate">Populate Financials</option>
+                    <option value="col-first">First Review Complete</option>
+                    <option value="col-second">Second Review Complete</option>
+                    <option value="col-flash">Flash JE Upload</option>
+                    <option value="col-final">Final JE Upload</option>
+                </select>
+          </label>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t">
+          <button type="button" class="px-3 py-2 rounded-lg border" data-close>Cancel</button>
+          <button type="submit" class="px-3 py-2 rounded-lg bg-brand-blue text-white hover:opacity-90">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
