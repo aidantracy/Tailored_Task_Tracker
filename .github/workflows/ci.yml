@@ -37,9 +37,9 @@ jobs:
         run: npm ci
 
       - name: Make Scripts Executable
-        run: chmod +x ./test.sh || true
+        run: chmod +x ./scripts/test.sh || true
 
       - name: Run All Tests
         env:
           SKIP_E2E: "true"
-        run: ./test.sh
+        run: ./scripts/test.sh
