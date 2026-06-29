@@ -39,7 +39,7 @@ def create_app(config_class=None) -> Flask:
         else:
             config_class = DevConfig
 
-    # Read APP_ROOT from env (Dr. H sets this to "/f25-ledger-line" on SDP)
+    # Read APP_ROOT from env to support deployment under a URL sub-path
     app_root = os.environ.get("APP_ROOT", "/").rstrip("/") or "/"
 
     # If we’re under a prefix, serve static files under that prefix too

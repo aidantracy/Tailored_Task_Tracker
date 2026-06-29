@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ledgerline-dashboard"
 version = "0.1.0"
-description = "St. Luke’s month-end process tracker"
+description = "Month-end financial close process tracker"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
