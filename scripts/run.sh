@@ -2,6 +2,9 @@
 # run.sh — start the stack (compose if available; host fallback), wait, and open browser
 set -euo pipefail
 
+# Always operate from the repository root, regardless of where this script is invoked from
+cd "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+
 # ===== Config (override via env) =====
 APP_URL="${APP_URL:-http://localhost:5000/}"   # What to open after start
 APP_SERVICE="${APP_SERVICE:-app}"               # Compose service name for Flask app

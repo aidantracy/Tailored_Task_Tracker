@@ -2,6 +2,9 @@
 # clean.sh — stop/remove the stack and optionally nuke ALL images (Docker or Podman)
 set -euo pipefail
 
+# Always operate from the repository root, regardless of where this script is invoked from
+cd "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+
 echo "🧹 Cleaning project"
 
 # ----- Podman-first envs -----

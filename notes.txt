@@ -1,7 +1,0 @@
-
-These are the business days of each month and following month: 
-Day 20 - populate financials (current month)
-Day 23 - first review complete (current month)
-Day 25 - second review complete  (current month)
-Day 1 - flash JE upload (following month)
-Day 4 - final JE upload  (following month)

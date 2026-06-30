@@ -5,6 +5,9 @@
 # - E2E (Cypress): Podman compose only (no Docker delegation)
 set -euo pipefail
 
+# Always operate from the repository root, regardless of where this script is invoked from
+cd "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+
 ###########
 # Helpers #
 ###########

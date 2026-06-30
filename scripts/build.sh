@@ -2,6 +2,9 @@
 # build.sh — Podman-only, verbose, idempotent
 set -euo pipefail
 
+# Always operate from the repository root, regardless of where this script is invoked from
+cd "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+
 IMAGE_NAME="${IMAGE_NAME:-dashboard-app}"
 INSTALL_DEV="${INSTALL_DEV:-1}"     # 1=dev deps; 0=prod-only
 DEBUG="${DEBUG:-0}"
