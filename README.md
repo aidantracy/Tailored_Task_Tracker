@@ -2,7 +2,7 @@
 
 LedgerLine is a web app for running a finance team's monthly close. It lays the close out as a board of milestone steps, each tied to a specific business day of the month, and tracks every task from "not started" to "done" with owners, due dates, comments, and history.
 
-I built it with two teammates over a semester as a software engineering capstone, working against a real finance department's close process.
+This was an industry-sponsored project that counted as both our senior capstone and an internship. I built it with two teammates over a semester, working directly with our sponsor at a hospital system and collaborating with the cybersecurity team to shape the requirements and design the app around the hospital's real month-end close.
 
 [![CI](https://github.com/aidantracy/Tailored_Task_Tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/aidantracy/Tailored_Task_Tracker/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
